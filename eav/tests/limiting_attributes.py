@@ -3,8 +3,7 @@ from django.test import TestCase
 import eav
 from ..registry import EavConfig
 from ..models import Attribute, Value
-
-from .models import Patient, Encounter
+from eav.tests.models import Patient, Encounter
 
 
 class LimittingAttributes(TestCase):

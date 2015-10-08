@@ -29,8 +29,9 @@ Classes
 from copy import deepcopy
 
 from django.forms import BooleanField, CharField, DateTimeField, FloatField, \
-                         IntegerField, ModelForm, ChoiceField, ValidationError
-from django.contrib.admin.widgets import AdminSplitDateTime
+                         IntegerField, ModelForm, ChoiceField, ValidationError, \
+    FileField, ImageField
+from django.contrib.admin.widgets import AdminSplitDateTime, AdminTextareaWidget
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -47,6 +48,9 @@ class BaseDynamicEntityForm(ModelForm):
 
     FIELD_CLASSES = {
         'text': CharField,
+        'textarea': CharField,
+        'file': FileField,
+        'image': ImageField,
         'float': FloatField,
         'int': IntegerField,
         'date': DateTimeField,
@@ -87,6 +91,8 @@ class BaseDynamicEntityForm(ModelForm):
 
             elif datatype == attribute.TYPE_DATE:
                 defaults.update({'widget': AdminSplitDateTime})
+            elif datatype == attribute.TYPE_TEXTAREA:
+                defaults.update({'widget': AdminTextareaWidget})
             elif datatype == attribute.TYPE_OBJECT:
                 continue
 

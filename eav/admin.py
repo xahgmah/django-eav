@@ -20,12 +20,13 @@
 
 from django.contrib import admin
 from django.contrib.admin.options import (
-    ModelAdmin, InlineModelAdmin, StackedInline
+    ModelAdmin, InlineModelAdmin
 )
 from django.forms.models import BaseInlineFormSet
 from django.utils.safestring import mark_safe
 
 from .models import Attribute, Value, EnumValue, EnumGroup
+
 
 class BaseEntityAdmin(ModelAdmin):
     

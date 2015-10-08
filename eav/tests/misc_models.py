@@ -1,9 +1,8 @@
 from django.test import TestCase
 
 from ..models import EnumGroup, Attribute, Value
-
 import eav
-from .models import Patient
+from eav.tests.models import Patient
 
 
 class MiscModels(TestCase):

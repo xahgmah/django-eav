@@ -4,9 +4,8 @@ from django.contrib.auth.models import User
 
 from ..registry import EavConfig
 from ..models import EnumValue, EnumGroup, Attribute, Value
-
 import eav
-from .models import Patient, Encounter
+from eav.tests.models import Patient, Encounter
 
 
 class Queries(TestCase):

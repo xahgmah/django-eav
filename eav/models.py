@@ -124,6 +124,9 @@ class Attribute(models.Model):
         * int (TYPE_INT)
         * float (TYPE_FLOAT)
         * text (TYPE_TEXT)
+        * textarea (TYPE_TEXTAREA)
+        * file (TYPE_FILE)
+        * image (TYPE_IMAGE)
         * date (TYPE_DATE)
         * bool (TYPE_BOOLEAN)
         * object (TYPE_OBJECT)
@@ -156,6 +159,9 @@ class Attribute(models.Model):
         unique_together = ('site', 'slug')
 
     TYPE_TEXT = 'text'
+    TYPE_TEXTAREA = 'textarea'
+    TYPE_FILE = 'file'
+    TYPE_IMAGE = 'image'
     TYPE_FLOAT = 'float'
     TYPE_INT = 'int'
     TYPE_DATE = 'date'
@@ -165,6 +171,9 @@ class Attribute(models.Model):
 
     DATATYPE_CHOICES = (
         (TYPE_TEXT, _(u"Text")),
+        (TYPE_TEXTAREA, _(u"Text area")),
+        (TYPE_FILE, _(u"File")),
+        (TYPE_IMAGE, _(u"Image")),
         (TYPE_FLOAT, _(u"Float")),
         (TYPE_INT, _(u"Integer")),
         (TYPE_DATE, _(u"Date")),
@@ -195,7 +204,7 @@ class Attribute(models.Model):
     def help_text(self):
         return self.description
 
-    datatype = EavDatatypeField(_(u"data type"), max_length=6,
+    datatype = EavDatatypeField(_(u"data type"), max_length=8,
                                 choices=DATATYPE_CHOICES)
 
     created = models.DateTimeField(_(u"created"), default=datetime.now,
@@ -220,6 +229,9 @@ class Attribute(models.Model):
         '''
         DATATYPE_VALIDATORS = {
             'text': validate_text,
+            'textarea': validate_text,
+            'file': validate_file,
+            'image': validate_file,
             'float': validate_float,
             'int': validate_int,
             'date': validate_date,
@@ -341,6 +353,8 @@ class Value(models.Model):
                                        fk_field='entity_id')
 
     value_text = models.TextField(blank=True, null=True)
+    value_file = models.FileField(upload_to='eav_uploads/', blank=True,
+                                  null=True)
     value_float = models.FloatField(blank=True, null=True)
     value_int = models.IntegerField(blank=True, null=True)
     value_date = models.DateTimeField(blank=True, null=True)
@@ -384,13 +398,24 @@ class Value(models.Model):
         '''
         Return the python object this value is holding
         '''
-        return getattr(self, 'value_%s' % self.attribute.datatype)
+        return getattr(self, 'value_%s' % self._get_data_type())
 
     def _set_value(self, new_value):
         '''
         Set the object this value is holding
         '''
-        setattr(self, 'value_%s' % self.attribute.datatype, new_value)
+        setattr(self, 'value_%s' % self._get_data_type(), new_value)
+
+    def _get_data_type(self):
+        '''
+        Get datatype for special types
+        '''
+        special_types = {
+            'textarea': 'text',
+            'image': 'file'
+        }
+        return special_types.get(self.attribute.datatype,
+                                 self.attribute.datatype)
 
     value = property(_get_value, _set_value)
 
@@ -482,7 +507,7 @@ class Entity(object):
                 value = self._getattr(attribute.slug)
             else:
                 value = values_dict.get(attribute.slug, None)
-            
+
             if value is None:
                 if attribute.required:
                     raise ValidationError(_(u"%(attr)s EAV field cannot " \
@@ -495,7 +520,7 @@ class Entity(object):
                     raise ValidationError(_(u"%(attr)s EAV field %(err)s") % \
                                               {'attr': attribute.slug,
                                                'err': e})
-                
+
     def get_values_dict(self):
         values_dict = dict()
         for value in self.get_values():
