@@ -516,7 +516,6 @@ class Entity(object):
                 value = self._getattr(attribute.slug)
             else:
                 value = values_dict.get(attribute.slug, None)
-
             if value is None:
                 if attribute.required:
                     raise ValidationError(_(u"%(attr)s EAV field cannot " \
