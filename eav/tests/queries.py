@@ -27,6 +27,7 @@ class Queries(TestCase):
         ynu.enums.add(self.yes)
         ynu.enums.add(self.no)
         ynu.enums.add(self.unkown)
+        ynu.save()
         Attribute.objects.create(name='fever', datatype=Attribute.TYPE_ENUM, enum_group=ynu)
 
     def tearDown(self):
@@ -45,7 +46,7 @@ class Queries(TestCase):
         self.assertEqual(Value.objects.count(), 2)
 
     def test_get_with_eav(self):
-        p1 = Patient.objects.get_or_create(name='Bob', eav__age=6)
+        p1, created = Patient.objects.get_or_create(name='Bob', eav__age=6)
         self.assertEqual(Patient.objects.get(eav__age=6), p1)
         p2 = Patient.objects.get_or_create(name='Fred', eav__age=6)
         self.assertRaises(Patient.MultipleObjectsReturned,
@@ -63,6 +64,7 @@ class Queries(TestCase):
                 [   'Beth',   21,  yes, 'France',   'Nice'  ]
         ]
         for row in data:
+            print row[4]
             Patient.objects.create(name=row[0], eav__age=row[1],
                                    eav__fever=row[2], eav__city=row[3],
                                    eav__country=row[4])

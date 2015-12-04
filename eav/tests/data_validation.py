@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
 import eav
+from django.utils import timezone
+
 from ..models import Attribute, Value, EnumValue, EnumGroup
 from eav.tests.models import Patient
 
@@ -89,9 +91,7 @@ class DataValidation(TestCase):
         self.assertRaises(ValidationError, p.save)
         p.eav.dob = 15
         self.assertRaises(ValidationError, p.save)
-        now = datetime.now()
-        now = datetime(year=now.year, month=now.month, day=now.day,
-                       hour=now.hour, minute=now.minute, second=now.second)
+        now = timezone.now()
         p.eav.dob = now
         p.save()
         self.assertEqual(Patient.objects.get(pk=p.pk).eav.dob, now)

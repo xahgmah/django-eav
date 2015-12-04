@@ -114,6 +114,6 @@ def validate_enum(value):
     '''
     from .models import EnumValue
     try:
-        EnumValue.objects.get(pk=value)
-    except EnumValue.DoesNotExist:
+        EnumValue.objects.get(pk=value.pk)
+    except:
         raise ValidationError(_(u"Must be an EnumValue model object instance"))
